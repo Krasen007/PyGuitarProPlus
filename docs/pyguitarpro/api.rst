@@ -8,6 +8,28 @@ General functions
 
 .. autofunction:: guitarpro.write
 
+.. autofunction:: guitarpro.detect_format
+
+
+Format and Detection
+--------------------
+
+.. autoclass:: guitarpro.GuitarProFormat
+   :members:
+   :undoc-members:
+
+.. autoexception:: guitarpro.FormatDetectionError
+
+
+Format-Specific Data
+--------------------
+
+.. autoclass:: guitarpro.GpifExtras
+   :members:
+
+.. autoclass:: guitarpro.GpifAutomation
+   :members:
+
 
 Models
 ------

@@ -1,5 +1,64 @@
-Guitar Pro File Format
-======================
+Guitar Pro File Formats
+=======================
+
+PyGuitarProPlus supports multiple Guitar Pro format families:
+
+- **Binary formats:** GP3, GP4, GP5 (documented below)
+- **GPIF-based formats:** GP6 (``.gpx``), GP7 (``.gp``), GP8 (``.gp``)
+
+
+GPIF-Based Formats (GP6, GP7, GP8)
+-----------------------------------
+
+GP6, GP7, and GP8 use GPIF (Guitar Pro Interchange Format), an XML-based format for representing tablature data.
+
+GP6 (``.gpx``)
+^^^^^^^^^^^^^^
+
+Guitar Pro 6 files use the ``.gpx`` extension and consist of:
+
+- **Container:** BCFZ (compressed) or BCFS (uncompressed) proprietary archive format
+- **Content:** ``score.gpif`` XML file + optional binary resources (RSE, stylesheets, etc.)
+- **Compression:** PyGuitarProPlus writes using literal-only BCFZ compression (valid but larger than Guitar Pro's
+  LZ-compressed files)
+
+GP7 (``.gp``)
+^^^^^^^^^^^^^
+
+Guitar Pro 7 files use the ``.gp`` extension and consist of:
+
+- **Container:** Standard ZIP archive (``PK`` magic bytes)
+- **Content:** ``Content/score.gpif`` or ``score.gpif`` XML file + ``VERSION`` file + optional resources
+- **Layout:** Preserves additional ZIP entries via ``format_extras.container_files``
+
+GP8 (``.gp``)
+^^^^^^^^^^^^^
+
+Guitar Pro 8 files also use the ``.gp`` extension with the same ZIP container as GP7:
+
+- **Detection:** Identified by ``VERSION`` file content (``8.x``) or ``<GPVersion>8</GPVersion>`` in GPIF XML
+- **Status:** Experimental due to limited real-world GP8 fixture coverage
+- **Compatibility:** Uses the same read/write pipeline as GP7 with version-aware serialization
+
+GPIF XML Structure
+^^^^^^^^^^^^^^^^^^
+
+The GPIF format represents:
+
+- Score metadata (title, artist, album, copyright, etc.)
+- Master track with tempo automations
+- Tracks with tuning, MIDI settings, and RSE configuration
+- Master bars (global measure properties: time signature, key, repeats, sections)
+- Bars, voices, beats, notes with full effect data
+- Rhythms (durations, tuplets, dotted notes)
+- Chord diagrams
+
+**Preserved via** ``GpifExtras``:
+
+- Automations (tempo, volume curves)
+- RSE/mixer XML per track
+- Track sounds and automations
+- Container files (BinaryStylesheet, etc.)
 
 
 Basic Guitar Pro 3–5 types
