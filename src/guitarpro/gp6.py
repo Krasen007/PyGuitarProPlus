@@ -55,8 +55,23 @@ class GP6File(GPFileBase):
 
     def writeSong(self, song: Song) -> None:
         """Write a GP6 (.gpx) file."""
-        # Regenerate container metadata to match current track count
-        update_container_metadata_for_song(song)
+        # Only regenerate container metadata if track count has changed
+        should_update = True
+        if song.format_extras is not None:
+            # Check if track count in existing metadata matches current track count
+            for name, content in song.format_extras.container_files:
+                if name == 'misc.xml':
+                    try:
+                        current_misc = content.decode('utf-8')
+                        expected_count = f'<PreferredTrackCount>{len(song.tracks)}</PreferredTrackCount>'
+                        if expected_count in current_misc:
+                            should_update = False
+                    except (UnicodeDecodeError, AttributeError):
+                        pass
+                    break
+        
+        if should_update:
+            update_container_metadata_for_song(song)
         
         gpif_bytes = GpifWriter().write(song, target_major_version=6)
         files: Dict[str, bytes] = {'score.gpif': gpif_bytes}
