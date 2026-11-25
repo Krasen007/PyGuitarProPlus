@@ -23,6 +23,7 @@ __all__ = [
     'PitchClass', 'MixTableItem', 'WahEffect', 'MixTableChange',
     'BendType', 'BendPoint', 'BendEffect', 'RSEMasterEffect', 'RSEEqualizer',
     'Accentuation', 'RSEInstrument', 'TrackRSE',
+    'GpifAutomation', 'GpifExtras', 'FormatExtras',
 ]
 
 
@@ -337,6 +338,7 @@ class Song:
     measureHeaders: list['MeasureHeader'] = attr.Factory(lambda: [MeasureHeader()])
     tracks: list['Track'] = attr.Factory(lambda self: [Track(self)], takes_self=True)
     masterEffect: RSEMasterEffect = attr.Factory(RSEMasterEffect)
+    format_extras: 'GpifExtras | None' = None
 
     _currentRepeatGroup: RepeatGroup = attr.ib(default=attr.Factory(RepeatGroup), hash=False, eq=False, repr=False)
 
@@ -1475,3 +1477,33 @@ class BendEffect:
 
     #: The max value of the bend points (y axis)
     maxValue = semitoneLength * 12
+
+
+@hashableAttrs
+class GpifAutomation:
+    """Represents a GPIF automation event (e.g. tempo or sound change)."""
+
+    type: str = ''
+    bar: int = 0
+    position: float = 0.0
+    value: str = ''
+    linear: bool = False
+    visible: bool = True
+
+
+@hashableAttrs
+class GpifExtras:
+    """Typed extension slot for GPIF-specific data without a direct core model equivalent."""
+
+    gp_version: str = attr.ib(default='', hash=False, eq=False)
+    gp_revision: str = attr.ib(default='', hash=False, eq=False)
+    encoding_description: str = attr.ib(default='', hash=False, eq=False)
+    automations: tuple[GpifAutomation, ...] = ()
+    master_track_anacrusis: bool = False
+    track_rse_xml: tuple[tuple[int, str], ...] = ()
+    track_sounds_xml: tuple[tuple[int, str], ...] = ()
+    track_automations_xml: tuple[tuple[int, str], ...] = ()
+    container_files: tuple[tuple[str, bytes], ...] = attr.ib(default=(), hash=False, eq=False)
+
+
+FormatExtras = GpifExtras

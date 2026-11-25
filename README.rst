@@ -9,9 +9,56 @@ PyGuitarPro
 Introduction
 ------------
 
-PyGuitarPro is a package to read, write and manipulate GP3, GP4 and GP5 files. Initially PyGuitarPro is a Python port
-of `AlphaTab <https://www.alphatab.net/>`_ which originally was a Haxe port of
-`TuxGuitar <https://sourceforge.net/projects/tuxguitar/>`_.
+PyGuitarProPlus is a package to read, write and manipulate Guitar Pro files (GP3, GP4, GP5, GP6 ``.gpx``, GP7 ``.gp``, and
+experimental GP8 ``.gp``). It builds on the work of PyGuitarPro which initially PyGuitarPro is a Python port of `AlphaTab <https://www.alphatab.net/>`_ which
+originally was a Haxe port of `TuxGuitar <https://sourceforge.net/projects/tuxguitar/>`_.
+
+Supported Formats
+-----------------
+
+================= ========= ================ ===========================
+Format            Extension Read / Write     Notes
+================= ========= ================ ===========================
+Guitar Pro 3      ``.gp3``  Read / Write     Binary format
+Guitar Pro 4      ``.gp4``  Read / Write     Binary format
+Guitar Pro 5      ``.gp5``  Read / Write     Binary format
+Guitar Pro 6      ``.gpx``  Read / Write     BCFZ/BCFS + GPIF XML
+Guitar Pro 7      ``.gp``   Read / Write     ZIP + GPIF XML
+Guitar Pro 8      ``.gp``   Read / Write     Experimental (GPIF XML)
+Guitar Pro 1/2    ``.gtp``  Unsupported      Not covered by alphaTab
+================= ========= ================ ===========================
+
+Format Detection & API
+----------------------
+
+.. code-block:: python
+
+   import guitarpro
+
+   # Auto-detect format from magic bytes or extension
+   fmt, version = guitarpro.detect_format('song.gpx')
+   song = guitarpro.parse('song.gpx')
+
+   # Explicit format or version override
+   song = guitarpro.parse('song.gp', format=guitarpro.GuitarProFormat.GP7)
+   guitarpro.write(song, 'copy.gpx', format=guitarpro.GuitarProFormat.GP6)
+   guitarpro.write(song, 'copy.gp', version=(7, 0, 0))
+
+   # Programmatic edit example
+   song.tracks[0].measures[0].voices[0].beats[0].notes[0].value = 5
+   guitarpro.write(song, 'edited.gpx')
+
+Format-specific GPIF data that has no direct equivalent in the core model (such as automations, RSE/mixer XML, and
+container files) is preserved in the typed ``song.format_extras`` (:class:`guitarpro.GpifExtras`) slot.
+
+Known Limitations
+-----------------
+
+- GP6 ``.gpx`` writing uses linear literal-only BCFZ compression (valid and readable, larger than LZ-compressed files).
+- Guitar Pro application-level metadata fidelity (e.g. visual layout/RSE binary blobs) is preserved best-effort via
+  ``format_extras`` and not guaranteed across format conversions.
+- Guitar Pro 1/2 (``.gtp``) files are not supported.
+- Guitar Pro 8 (``.gp``) support is experimental due to limited real-world GP8 fixture coverage.
 
 This package helps you achieve several goals you might find yourself yearning to do in a day-to-day tabber life:
 

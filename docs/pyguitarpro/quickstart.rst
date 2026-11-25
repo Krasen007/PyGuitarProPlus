@@ -25,6 +25,16 @@ file according to your desired format:
 .. code-block:: python
 
    guitarpro.write(demo, 'Demo v5.gp4')
+   guitarpro.write(demo, 'Demo v6.gpx')
+   guitarpro.write(demo, 'Demo v7.gp')
+
+You can also inspect or explicitly override the format:
+
+.. code-block:: python
+
+   fmt, version = guitarpro.detect_format('song.gpx')
+   song = guitarpro.parse('song.gpx', format=guitarpro.GuitarProFormat.GP6)
+   guitarpro.write(song, 'out.gp', format=guitarpro.GuitarProFormat.GP7)
 
 Functions :func:`guitarpro.parse` and :func:`guitarpro.write` support not only filenames, but also file-like object:
 
@@ -36,7 +46,7 @@ Functions :func:`guitarpro.parse` and :func:`guitarpro.write` support not only f
 
 .. note::
 
-   PyGuitarPro supports only GP3, GP4 and GP5 files. Support for GPX (Guitar Pro 6) files is out of scope of the
-   project.
+   PyGuitarPro supports GP3, GP4, GP5, GP6 (``.gpx``), GP7 (``.gp``), and experimental GP8 (``.gp``) files.
+   Guitar Pro 1/2 (``.gtp``) files are not supported.
 
 .. vim: tw=120 cc=121
