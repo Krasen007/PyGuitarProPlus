@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Dict
 
+from .gp6_container_metadata import update_container_metadata_for_song
 from .gpif.gp6_container import GPXReadError, read_gpx, write_gpx
 from .gpif.gpif_parser import GpifParseError, GpifParser
 from .gpif.gpif_writer import GpifWriter
@@ -54,6 +55,9 @@ class GP6File(GPFileBase):
 
     def writeSong(self, song: Song) -> None:
         """Write a GP6 (.gpx) file."""
+        # Regenerate container metadata to match current track count
+        update_container_metadata_for_song(song)
+        
         gpif_bytes = GpifWriter().write(song, target_major_version=6)
         files: Dict[str, bytes] = {'score.gpif': gpif_bytes}
         if song.format_extras is not None:
